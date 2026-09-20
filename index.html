@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#cdd9c3">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="钱">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23587158'/%3E%3Ctext x='16' y='24' font-size='22' text-anchor='middle' fill='%23eef3e6'%3E钱%3C/text%3E%3C/svg%3E">
+<title>Qiǎn - Expense Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+<div class="page">
+
+  <div class="masthead">
+    <h1>钱</h1>
+    <nav class="site-nav">
+      <a href="index.html" aria-current="page">Ledger</a>
+      <a href="dashboard.html">Dashboard</a>
+    </nav>
+  </div>
+
+  <div class="book">
+    <div class="tabs">
+      <button class="tab active" data-tab="entry">New Entry</button>
+      <button class="tab" data-tab="report">Monthly Summary</button>
+      <button class="tab" data-tab="budget">Budget</button>
+    </div>
+
+    <!-- ENTRY PANEL -->
+    <div class="panel active" id="panel-entry">
+      <form id="entry-form">
+        <label for="f-item">Item</label>
+        <input type="text" id="f-item" placeholder="Cai Fan" required>
+
+        <label for="f-category">Category</label>
+        <select id="f-category">
+          <option>Food</option>
+          <option>Transport</option>
+          <option>Groceries</option>
+          <option>Entertainment</option>
+          <option>Shopping</option>
+          <option>Other</option>
+          <option value="__custom">+ Custom category…</option>
+        </select>
+        <input type="text" id="f-category-custom" placeholder="Enter category" style="display:none; margin-top:8px;">
+
+        <div class="row2">
+          <div>
+            <label for="f-amount">Amount</label>
+            <input type="number" id="f-amount" step="0.01" min="0" inputmode="decimal" placeholder="0.00" required>
+          </div>
+          <div>
+            <label for="f-date">Date</label>
+            <input type="date" id="f-date" required>
+          </div>
+        </div>
+
+        <button type="submit" class="stamp-btn">Ring Up</button>
+        <div class="status-line" id="status"></div>
+      </form>
+
+      <div class="entries">
+        <h3>Recent Entries</h3>
+        <div id="recent-list"><div class="empty">Loading…</div></div>
+      </div>
+
+      <div class="field-note" id="config-note"></div>
+    </div>
+
+    <!-- REPORT PANEL -->
+    <div class="panel" id="panel-report">
+      <select id="month-select" class="month-select"></select>
+
+      <div class="total-line">
+        <span class="label">Total Spent</span>
+        <span class="amount" id="month-total">$0.00</span>
+      </div>
+
+      <div class="stat-block" id="month-progress-block"></div>
+      <div class="stat-block" id="overall-budget-block"></div>
+
+      <div class="section-divider"></div>
+      <div id="category-breakdown"><div class="empty">Loading…</div></div>
+    </div>
+
+    <!-- BUDGET PANEL -->
+    <div class="panel" id="panel-budget">
+      <form id="budget-form">
+        <label for="b-month">Month</label>
+        <select id="b-month"></select>
+
+        <div id="budget-cat-fields"></div>
+
+        <button type="submit" class="stamp-btn">Save Budgets</button>
+        <div class="status-line" id="budget-status"></div>
+      </form>
+
+      <div class="field-note">Budgets apply to the six built-in categories. A custom category you typed on the New Entry tab won't have a budget line unless its name matches one of these exactly.</div>
+
+      <div class="budget-list">
+        <div class="list-head">Budgets Set</div>
+        <div id="budget-history"><div class="empty">Loading…</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="assets/util.js"></script>
+<script src="assets/api.js"></script>
+<script src="assets/ledger.js"></script>
+</body>
+</html>

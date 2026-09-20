@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#cdd9c3">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="钱">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23587158'/%3E%3Ctext x='16' y='24' font-size='22' text-anchor='middle' fill='%23eef3e6'%3E钱%3C/text%3E%3C/svg%3E">
+<title>钱 · Finance Overview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+<div class="page wide">
+
+  <div class="masthead">
+    <h1>钱</h1>
+    <nav class="site-nav">
+      <a href="index.html">Ledger</a>
+      <a href="dashboard.html" aria-current="page">Dashboard</a>
+    </nav>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="overview">Finance Overview</button>
+    <button class="tab" data-tab="position">Update Position</button>
+  </div>
+
+  <div class="status-line" id="boot-status">Loading…</div>
+
+  <!-- ==================== OVERVIEW ==================== -->
+  <div class="panel active" id="panel-overview">
+
+    <div class="chart-grid" style="margin-bottom:16px;">
+
+      <!-- Net savings -->
+      <section class="card">
+        <div class="card-head">
+          <h2 class="card-title">Current Net Savings</h2>
+          <span class="card-note">monthly average of snapshots</span>
+        </div>
+        <span class="hero" id="kpi-savings">$0.00</span>
+        <span class="hero-sub" id="kpi-savings-sub">—</span>
+        <div style="margin:10px 0 6px;" id="kpi-savings-delta"></div>
+        <div class="chart-wrap" id="chart-savings"></div>
+        <div class="card-foot">
+          <button class="table-toggle" data-target="table-savings" aria-expanded="false">Show table</button>
+        </div>
+        <div class="table-view" id="table-savings"></div>
+      </section>
+
+      <!-- Monthly spending -->
+      <section class="card">
+        <div class="card-head">
+          <h2 class="card-title">Monthly Spending</h2>
+          <span class="card-note">total rung up per month</span>
+        </div>
+        <span class="hero" id="kpi-spend">$0.00</span>
+        <span class="hero-sub" id="kpi-spend-sub">—</span>
+        <div style="margin:10px 0 6px;" id="kpi-spend-delta"></div>
+        <div class="chart-wrap" id="chart-spending"></div>
+        <div class="card-foot">
+          <button class="table-toggle" data-target="table-spending" aria-expanded="false">Show table</button>
+        </div>
+        <div class="table-view" id="table-spending"></div>
+      </section>
+
+    </div>
+
+    <!-- Supporting tiles -->
+    <div class="tile-grid">
+      <div class="tile">
+        <span class="t-label">Net Worth</span>
+        <span class="t-value" id="tile-networth">$0.00</span>
+        <span class="t-sub" id="tile-networth-sub">—</span>
+      </div>
+      <div class="tile">
+        <span class="t-label">Investments</span>
+        <span class="t-value" id="tile-invest">$0.00</span>
+        <span class="t-sub" id="tile-invest-sub">—</span>
+      </div>
+      <div class="tile">
+        <span class="t-label">Budget Used</span>
+        <span class="t-value" id="tile-budget">—</span>
+        <span class="t-sub" id="tile-budget-sub">—</span>
+      </div>
+    </div>
+
+    <!-- Position breakdown -->
+    <section class="card">
+      <div class="card-head">
+        <h2 class="card-title">Where the Money Sits</h2>
+        <span class="card-note" id="breakdown-asof"></span>
+      </div>
+      <div id="position-breakdown"><div class="empty">Loading…</div></div>
+    </section>
+
+    <div class="field-note" id="config-note">
+      Net savings is the sum of every <strong>Savings</strong> account in your most recent
+      snapshot. The chart plots each month's average across the snapshots taken that month;
+      months with no snapshot are skipped rather than drawn as zero.
+    </div>
+  </div>
+
+  <!-- ================ UPDATE POSITION ================= -->
+  <div class="panel" id="panel-position">
+    <section class="card">
+      <div class="card-head">
+        <h2 class="card-title">Record a Financial Position</h2>
+        <span class="card-note" id="pos-note"></span>
+      </div>
+
+      <form id="pos-form">
+        <div class="pos-toolbar">
+          <div class="field">
+            <label for="pos-date">Snapshot date</label>
+            <input type="date" id="pos-date">
+          </div>
+        </div>
+
+        <div class="pos-head">
+          <span>Account</span>
+          <span>Type</span>
+          <span class="h-amount">Amount</span>
+          <span>Remarks</span>
+          <span></span>
+        </div>
+
+        <div id="pos-rows"></div>
+
+        <button type="button" class="ghost-btn" id="add-row" style="margin-top:14px;">+ Add account</button>
+
+        <div class="pos-total">
+          <span>Savings</span><span class="amount" id="pos-sum-savings">$0.00</span>
+        </div>
+        <div class="pos-total" style="border-top:1px dotted rgba(0,0,0,0.2); margin-top:6px;">
+          <span>Investments</span><span class="amount" id="pos-sum-invest">$0.00</span>
+        </div>
+        <div class="pos-total">
+          <span>Total net worth</span><span class="amount" id="pos-sum-total">$0.00</span>
+        </div>
+
+        <button type="submit" class="stamp-btn">Save Snapshot</button>
+        <div class="status-line" id="pos-status"></div>
+      </form>
+
+      <div class="field-note">
+        A snapshot is the whole picture on one date. Saving the same date twice replaces it
+        rather than stacking duplicates, so you can correct a figure without leaving a mess
+        in the Sheet.
+      </div>
+    </section>
+
+    <div class="snapshot-list">
+      <div class="list-head">Snapshots Recorded</div>
+      <div id="snapshot-list"><div class="empty">Loading…</div></div>
+    </div>
+  </div>
+
+  <!-- Outside the panels so it is reachable from either tab. -->
+  <div class="page-foot">
+    <button class="link-btn" id="sign-out">Forget passphrase on this device</button>
+  </div>
+
+</div>
+
+<script src="assets/util.js"></script>
+<script src="assets/api.js"></script>
+<script src="assets/chart.js"></script>
+<script src="assets/dashboard.js"></script>
+</body>
+</html>

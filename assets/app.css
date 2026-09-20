@@ -1,0 +1,491 @@
+/* ==================================================================
+   app.css — shared by index.html (expense tracker) and
+   dashboard.html (finance overview).
+
+   Sections:
+     1. Design tokens
+     2. Base + masthead + nav
+     3. Shared primitives (tabs, forms, buttons, status, tables)
+     4. Ledger page (index.html)
+     5. Dashboard page (dashboard.html)
+     6. Chart styles
+     7. Lock overlay
+   ================================================================== */
+
+/* ------------------------- 1. TOKENS ------------------------- */
+:root{
+  color-scheme: light;
+
+  /* paper & ink */
+  --paper: #eef3e6;
+  --paper-bar: #dfe9d6;
+  --plane: #cdd9c3;
+  --ink: #1c3626;
+  --ink-soft: #4b5d50;
+  --rule: #93ad8f;
+  --rule-strong: #587158;
+  --stamp: #a13d2e;
+  --brass: #a9823f;
+  --binder: #d9cfa8;
+
+  /* data ink — validated against the #eef3e6 paper surface:
+     lightness band, chroma floor and >=3:1 contrast all pass. */
+  --series: #1264a3;
+  --series-wash: rgba(18,100,163,0.10);
+
+  /* status — always shipped with an arrow glyph + words, never colour alone */
+  --good: #1b6e3c;
+  --bad: #a13d2e;
+
+  /* chart chrome */
+  --grid-line: rgba(28,54,38,0.11);
+  --axis-ink: #6b7d6f;
+
+  --card-shadow: 0 18px 40px rgba(20,40,25,0.18);
+  --card-shadow-sm: 0 6px 18px rgba(20,40,25,0.10);
+}
+
+/* --------------------- 2. BASE / MASTHEAD -------------------- */
+*{ box-sizing: border-box; }
+
+html, body{
+  margin:0; padding:0; min-height:100vh;
+  background: var(--plane);
+  background-image:
+    radial-gradient(circle at 15% 10%, rgba(255,255,255,0.35), transparent 40%),
+    radial-gradient(circle at 85% 90%, rgba(0,0,0,0.08), transparent 45%);
+  background-attachment: fixed;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--ink);
+  -webkit-text-size-adjust: 100%;
+}
+
+.page{ max-width: 720px; margin: 32px auto 80px; padding: 0 16px; }
+.page.wide{ max-width: 1080px; }
+
+.masthead{
+  display:flex; align-items:baseline; justify-content:space-between;
+  gap:12px; flex-wrap:wrap;
+  padding: 0 6px 14px;
+  border-bottom: 3px double var(--rule-strong);
+  margin-bottom: 18px;
+}
+.masthead h1{
+  font-family:'Special Elite', monospace;
+  font-size: 28px; letter-spacing: 1px; margin:0; color: var(--ink);
+}
+.masthead .sub{
+  font-size: 11px; color: var(--ink-soft);
+  letter-spacing: 2px; text-transform: uppercase;
+}
+
+/* cross-page nav */
+.site-nav{ display:flex; gap:14px; align-items:baseline; }
+.site-nav a{
+  font-size:11px; letter-spacing:1.5px; text-transform:uppercase;
+  color: var(--ink-soft); text-decoration:none;
+  border-bottom:1.5px solid transparent; padding-bottom:2px;
+}
+.site-nav a:hover{ color: var(--ink); }
+.site-nav a[aria-current="page"]{ color: var(--stamp); border-bottom-color: var(--stamp); }
+
+/* ---------------- 3. SHARED PRIMITIVES ---------------- */
+.tabs{ display:flex; gap:6px; margin-bottom:18px; flex-wrap:wrap; }
+.tab{
+  font-family:'IBM Plex Mono', monospace;
+  font-size:12px; letter-spacing:1px; text-transform:uppercase;
+  background:none; border:1px solid var(--rule-strong);
+  color: var(--ink-soft);
+  padding:8px 14px; cursor:pointer; border-radius:3px 3px 0 0;
+  border-bottom:none;
+}
+.tab.active{
+  background: var(--paper); color: var(--stamp);
+  font-weight:600; box-shadow: 0 -2px 0 var(--stamp) inset;
+}
+.panel{ display:none; }
+.panel.active{ display:block; }
+
+label{
+  display:block; font-size:11px; text-transform:uppercase; letter-spacing:1.5px;
+  color: var(--ink-soft); margin-bottom:4px; margin-top:14px;
+}
+input, select, textarea{
+  width:100%; font-family:'IBM Plex Mono', monospace; font-size:15px;
+  background:transparent; border:none; border-bottom: 1.5px solid var(--rule-strong);
+  padding:6px 2px; color:var(--ink); outline:none; border-radius:0;
+}
+input:focus, select:focus, textarea:focus{ border-bottom-color: var(--stamp); }
+.row2{ display:flex; gap:16px; }
+.row2 > div{ flex:1; }
+
+.stamp-btn{
+  margin-top:22px; width:100%;
+  font-family:'Special Elite', monospace;
+  font-size:16px; letter-spacing:2px; text-transform:uppercase;
+  background: transparent;
+  border: 2.5px solid var(--stamp);
+  color: var(--stamp);
+  padding: 10px; border-radius: 6px; cursor:pointer;
+  transform: rotate(-1deg);
+  transition: transform .15s ease, background .15s ease, color .15s ease;
+}
+.stamp-btn:hover{ background: var(--stamp); color:#fff; transform: rotate(0deg); }
+.stamp-btn:active{ transform: scale(0.97) rotate(0deg); }
+
+.ghost-btn{
+  font-family:'IBM Plex Mono', monospace;
+  font-size:11px; letter-spacing:1.5px; text-transform:uppercase;
+  background:transparent; border:1px solid var(--rule-strong); color:var(--ink-soft);
+  padding:6px 12px; border-radius:3px; cursor:pointer;
+}
+.ghost-btn:hover{ border-color:var(--stamp); color:var(--stamp); }
+
+.status-line{ font-size:12px; color:var(--ink-soft); margin-top:10px; min-height:16px; }
+.status-line.err{ color:var(--stamp); }
+.status-line.ok{ color: var(--rule-strong); }
+
+.field-note{
+  font-size:11px; color:var(--ink-soft); margin-top:18px; line-height:1.5;
+  border-top:1px dashed var(--rule); padding-top:10px;
+}
+.field-note code{ background:#00000010; padding:1px 5px; border-radius:3px; }
+
+.empty{ font-size:13px; color:var(--ink-soft); font-style:italic; padding:12px 0; }
+
+.data-table{ width:100%; border-collapse:collapse; font-size:12px; margin-top:8px; }
+.data-table th, .data-table td{
+  text-align:left; padding:5px 6px; border-bottom:1px dotted rgba(0,0,0,0.14);
+  font-weight:400;
+}
+.data-table th{ color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.5px; font-size:11px; }
+.data-table td{ text-align:right; font-variant-numeric: tabular-nums; }
+
+/* A wide table scrolls inside its own card instead of pushing the
+   whole page sideways on a phone. */
+.table-scroll{ overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table-scroll .data-table{ min-width: 100%; }
+
+/* Remarks: its own column on a laptop, a sub-line under the account
+   name on a phone — dropping the column entirely would lose the text. */
+.row-remarks{ display:none; }
+@media (max-width: 680px){
+  .data-table .col-remarks{ display:none; }
+  .row-remarks{
+    display:block; font-size:10px; font-weight:400;
+    color: var(--axis-ink); letter-spacing:0; text-transform:none; margin-top:2px;
+  }
+}
+
+/* ------------------- 4. LEDGER PAGE ------------------- */
+.book{
+  position:relative;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--paper) 0px, var(--paper) 27px,
+    var(--paper-bar) 27px, var(--paper-bar) 54px
+  );
+  border-radius: 4px;
+  box-shadow: var(--card-shadow);
+  padding: 28px 26px 26px 46px;
+  border: 1px solid #c9d6bf;
+}
+.book::before{
+  content:""; position:absolute; left: 18px; top: 0; bottom: 0; width: 2px;
+  background: repeating-linear-gradient(to bottom, var(--binder) 0 10px, transparent 10px 24px);
+  opacity:0.9;
+}
+.book::after{
+  content:""; position:absolute; left: 0; top: 0; bottom: 0; width: 30px;
+  background-image: radial-gradient(circle at 8px 0, transparent 5px, var(--paper) 5.5px);
+  background-size: 100% 40px; background-repeat: repeat-y;
+}
+
+.month-select{ margin-bottom: 12px; }
+.total-line{
+  display:flex; justify-content:space-between; align-items:baseline;
+  border-bottom: 3px double var(--rule-strong);
+  padding-bottom: 10px; margin-bottom: 12px;
+}
+.total-line .label{ font-family:'Special Elite',monospace; font-size:15px; letter-spacing:1px; }
+.total-line .amount{ font-size:22px; font-weight:700; }
+
+.stat-block{ margin-bottom: 16px; }
+.stat-block .s-row{ display:flex; justify-content:space-between; font-size:13px; padding:2px 0; }
+.stat-block .s-amt{ font-weight:600; }
+.stat-block .s-amt.over{ color: var(--stamp); }
+.stat-block .s-amt.under{ color: var(--rule-strong); }
+.stat-block .s-bar-track{ height:8px; background:rgba(0,0,0,0.08); border-radius:2px; overflow:hidden; margin-top:6px; }
+.stat-block .s-bar-fill{ height:100%; border-radius:2px; }
+.stat-block .s-bar-fill.spend{ background: linear-gradient(90deg, var(--rule-strong), var(--stamp)); }
+.stat-block .s-bar-fill.progress{ background: var(--brass); }
+.stat-block .no-budget{ font-style:italic; color:var(--ink-soft); font-size:12px; }
+.stat-block a.set-link{ color: var(--stamp); cursor:pointer; text-decoration:underline; }
+.section-divider{ border-top:1px dashed var(--rule); margin: 16px 0; }
+
+.cat-row{ margin-bottom:10px; border-bottom:1px dotted rgba(0,0,0,0.12); padding-bottom:10px; }
+.cat-row summary{ list-style:none; cursor:pointer; outline:none; }
+.cat-row summary::-webkit-details-marker{ display:none; }
+.cat-row .cat-head{ display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px; }
+.cat-row .cat-name{ text-transform:uppercase; letter-spacing:1px; }
+.cat-row .cat-name::before{
+  content:"▸"; display:inline-block; font-size:10px; width:12px;
+  color: var(--ink-soft); transition: transform .15s ease;
+}
+.cat-row[open] .cat-name::before{ transform: rotate(90deg); }
+.cat-row .cat-amt{ font-weight:600; text-align:right; }
+.cat-row .cat-pct{ font-weight:400; }
+.cat-row .cat-pct.over{ color: var(--stamp); font-weight:600; }
+.cat-row .cat-pct.muted{ color: var(--ink-soft); font-style:italic; }
+.cat-bar-track{ height:7px; background:rgba(0,0,0,0.08); border-radius:2px; overflow:hidden; }
+.cat-bar-fill{ height:100%; background: linear-gradient(90deg, var(--rule-strong), var(--stamp)); border-radius:2px; }
+.cat-expenses{ margin-top:10px; padding-left:14px; }
+.cat-expenses .entry-row{ font-size:12px; padding:4px 0; }
+.cat-expenses .empty{ padding:4px 0; font-size:12px; }
+
+.entries{ margin-top:24px; }
+.entries h3, .list-head{
+  font-family:'Special Elite', monospace; font-size:13px; letter-spacing:1px;
+  color: var(--ink-soft); text-transform:uppercase; margin-bottom:8px;
+  border-bottom:1px dashed var(--rule); padding-bottom:6px;
+}
+.entry-row{
+  display:flex; justify-content:space-between; align-items:baseline; gap:8px;
+  font-size:13px; padding:5px 0; border-bottom:1px dotted rgba(0,0,0,0.12);
+}
+.entry-row .e-date{ color: var(--ink-soft); width:82px; flex-shrink:0; font-size:12px; }
+.entry-row .e-mid{ flex:1; min-width:0; }
+.entry-row .e-item{ display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.entry-row .e-cat{ display:block; font-size:10px; text-transform:uppercase; letter-spacing:0.5px; color:var(--ink-soft); }
+.entry-row .e-amt{ font-weight:600; width:80px; text-align:right; flex-shrink:0; }
+
+.budget-cat-row{ display:flex; align-items:center; gap:12px; margin-top:12px; }
+.budget-cat-row label{ margin:0; flex:1; }
+.budget-cat-row input{ width:110px; flex-shrink:0; text-align:right; }
+
+.budget-list{ margin-top:24px; }
+.budget-month-group{ margin-bottom:16px; }
+.budget-month-group h4{
+  font-family:'Special Elite', monospace; font-size:12px; letter-spacing:1px;
+  color: var(--ink); margin: 0 0 4px; text-transform:uppercase;
+}
+.budget-row{
+  display:flex; justify-content:space-between; font-size:13px; padding:3px 0;
+  border-bottom:1px dotted rgba(0,0,0,0.12);
+}
+
+/* ----------------- 5. DASHBOARD PAGE ------------------ */
+.card{
+  background: var(--paper);
+  border: 1px solid #c9d6bf;
+  border-radius: 4px;
+  box-shadow: var(--card-shadow-sm);
+  padding: 16px 18px 18px;
+}
+.card-head{
+  display:flex; justify-content:space-between; align-items:baseline; gap:10px;
+  border-bottom: 1px solid var(--grid-line);
+  padding-bottom: 8px; margin-bottom: 12px;
+}
+.card-title{
+  font-size:11px; letter-spacing:1.8px; text-transform:uppercase;
+  color: var(--ink-soft); margin:0; font-weight:500;
+}
+.card-note{ font-size:10px; letter-spacing:0.5px; color: var(--axis-ink); }
+
+/* KPI tiles */
+.tile-grid{
+  display:grid; gap:12px; margin-bottom:16px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+.tile{
+  background: var(--paper); border:1px solid #c9d6bf; border-radius:4px;
+  box-shadow: var(--card-shadow-sm); padding: 12px 14px 13px;
+}
+.tile .t-label{
+  font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+  color: var(--ink-soft); display:block; margin-bottom:6px;
+}
+.tile .t-value{ font-size:20px; font-weight:600; line-height:1.15; display:block; }
+.tile .t-sub{ font-size:11px; color: var(--axis-ink); display:block; margin-top:4px; }
+
+/* hero figure — stays in the body mono face, not the display face */
+.hero{
+  font-family:'IBM Plex Mono', monospace;
+  font-size: clamp(30px, 8vw, 40px);
+  font-weight: 600; line-height: 1.05; letter-spacing: -0.5px;
+  display:block;
+}
+.hero-sub{ font-size:11px; color: var(--axis-ink); display:block; margin-top:6px; }
+
+/* delta cue: arrow glyph + words, so colour is never the only signal.
+   .good / .bad describe the *meaning*, not the direction — spending
+   that falls is good, savings that fall are not. */
+.delta{ font-size:12px; font-weight:600; display:inline-flex; align-items:baseline; gap:4px; }
+.delta.good{ color: var(--good); }
+.delta.bad{ color: var(--bad); }
+.delta.flat{ color: var(--ink-soft); }
+.delta .d-word{ font-weight:400; color: var(--ink-soft); }
+
+.chart-grid{ display:grid; gap:16px; grid-template-columns: 1fr; }
+@media (min-width: 860px){
+  .chart-grid{ grid-template-columns: 1fr 1fr; }
+}
+
+.card-foot{
+  display:flex; justify-content:flex-end; margin-top:8px;
+  border-top:1px dotted rgba(0,0,0,0.12); padding-top:6px;
+}
+.table-toggle, .link-btn{
+  background:none; border:none; padding:2px 0; cursor:pointer;
+  font-family:'IBM Plex Mono', monospace; font-size:10px;
+  letter-spacing:1.2px; text-transform:uppercase;
+  color: var(--ink-soft); text-decoration:underline;
+}
+.table-toggle:hover, .link-btn:hover{ color: var(--stamp); }
+.table-view{ display:none; }
+.table-view.show{ display:block; }
+
+/* positions editor */
+.pos-toolbar{
+  display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;
+  margin-bottom: 6px;
+}
+.pos-toolbar .field{ flex: 0 1 200px; }
+.pos-toolbar label{ margin-top:0; }
+
+.pos-head{
+  display:none;
+  font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+  color: var(--ink-soft);
+  padding: 10px 0 6px; border-bottom:1px solid var(--grid-line);
+}
+.pos-row{
+  display:grid; gap:10px; align-items:center;
+  grid-template-columns: 1fr;
+  padding: 12px 0; border-bottom:1px dotted rgba(0,0,0,0.16);
+}
+/* Stacked on a phone, the remove button would otherwise claim a whole
+   row of its own; pin it beside the account name instead. */
+@media (max-width: 759px){
+  .pos-row{ position: relative; padding: 14px 0 12px; }
+  .pos-row .cell-del{ position: absolute; top: 10px; right: 0; }
+  .pos-row .cell-account{ padding-right: 40px; }
+}
+.pos-row .cell label{ margin-top:0; }
+.pos-row input, .pos-row select{ font-size:14px; }
+.pos-row .cell-amount input{ text-align:right; font-variant-numeric: tabular-nums; }
+.pos-row .cell-del{ display:flex; justify-content:flex-end; }
+.del-btn{
+  background:none; border:1px solid var(--rule); color:var(--ink-soft);
+  width:28px; height:28px; border-radius:3px; cursor:pointer;
+  font-size:14px; line-height:1; display:flex; align-items:center; justify-content:center;
+}
+.del-btn:hover{ border-color:var(--stamp); color:var(--stamp); }
+
+@media (min-width: 760px){
+  .pos-head, .pos-row{
+    grid-template-columns: 1.4fr 0.9fr 1fr 1.6fr 40px;
+    gap:12px;
+  }
+  .pos-head{ display:grid; }
+  .pos-row .cell label{ display:none; }   /* the header row labels these */
+  .pos-head .h-amount{ text-align:right; }
+}
+
+.pos-total{
+  display:flex; justify-content:space-between; align-items:baseline;
+  border-top: 3px double var(--rule-strong); margin-top:14px; padding-top:10px;
+  font-size:13px;
+}
+.pos-total .amount{ font-size:18px; font-weight:700; font-variant-numeric: tabular-nums; }
+
+.snapshot-list{ margin-top:22px; }
+.snapshot-row{
+  display:flex; justify-content:space-between; gap:10px;
+  font-size:13px; padding:5px 0; border-bottom:1px dotted rgba(0,0,0,0.12);
+}
+.snapshot-row .s-date{ color:var(--ink-soft); }
+.snapshot-row .s-nums{ font-variant-numeric: tabular-nums; }
+.snapshot-row button{
+  background:none; border:none; color:var(--stamp); cursor:pointer;
+  font-family:'IBM Plex Mono',monospace; font-size:11px;
+  text-decoration:underline; padding:0;
+}
+
+.page-foot{
+  margin-top: 26px; padding-top: 10px;
+  border-top: 1px dashed var(--rule);
+  display:flex; justify-content:flex-start;
+}
+
+/* ------------------- 6. CHART STYLES ------------------ */
+.chart-wrap{ position:relative; width:100%; }
+.line-chart{ display:block; width:100%; height:auto; outline:none; }
+.line-chart:focus-visible{ outline:2px solid var(--stamp); outline-offset:2px; border-radius:3px; }
+
+.grid-line{ stroke: var(--grid-line); stroke-width:1; shape-rendering: crispEdges; }
+.axis-text{
+  font-family:'IBM Plex Mono', monospace; font-size:10px;
+  fill: var(--axis-ink); font-variant-numeric: tabular-nums;
+}
+/* The paper-coloured stroke behind the glyphs keeps the endpoint value
+   readable when the line or a gridline passes right under it. */
+.endpoint-label{
+  font-family:'IBM Plex Mono', monospace; font-size:11px; font-weight:600;
+  fill: var(--ink);
+  stroke: var(--paper); stroke-width: 3.5px; stroke-linejoin: round;
+  paint-order: stroke fill;
+}
+.crosshair{ stroke: var(--rule-strong); stroke-width:1; opacity:0.45; }
+
+.chart-tip{
+  position:absolute; pointer-events:none; opacity:0;
+  transition: opacity .1s ease;
+  background: var(--ink); color: var(--paper);
+  padding: 5px 9px; border-radius:3px; font-size:11px; line-height:1.45;
+  white-space:nowrap; box-shadow: 0 4px 12px rgba(0,0,0,0.25); z-index:5;
+}
+.chart-tip.show{ opacity:1; }
+.chart-tip .tip-label{ display:block; opacity:0.75; font-size:10px; letter-spacing:0.5px; }
+.chart-tip .tip-value{ display:block; font-weight:600; font-variant-numeric: tabular-nums; }
+
+.chart-empty{
+  font-size:12px; color:var(--ink-soft); font-style:italic;
+  padding: 34px 0; text-align:center;
+}
+
+/* ------------------ 7. LOCK OVERLAY ------------------- */
+.lock-overlay{
+  display:none; position:fixed; inset:0; z-index:100;
+  background: rgba(28,54,38,0.55);
+  backdrop-filter: blur(3px);
+  align-items:center; justify-content:center; padding:20px;
+}
+.lock-overlay.show{ display:flex; }
+.lock-card{
+  background: var(--paper); border:1px solid #c9d6bf; border-radius:4px;
+  box-shadow: var(--card-shadow); padding: 26px 24px 24px;
+  max-width: 380px; width:100%;
+}
+.lock-card h2{
+  font-family:'Special Elite', monospace; font-size:20px; letter-spacing:1px;
+  margin:0 0 10px;
+}
+.lock-card p{ font-size:12px; line-height:1.6; color:var(--ink-soft); margin:0 0 4px; }
+.lock-card code{ background:#00000010; padding:1px 5px; border-radius:3px; }
+
+/* ---------------------- responsive -------------------- */
+@media (max-width:560px){
+  .masthead h1{ font-size:22px; }
+  .book{ padding:22px 16px 20px 36px; }
+  .page{ margin-top:22px; }
+  .card{ padding:14px 14px 16px; }
+  /* Stack the card header rather than squeezing the title and its note
+     into two cramped wrapped columns. */
+  .card-head{ flex-direction: column; align-items: flex-start; gap:3px; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{ transition: none !important; animation: none !important; }
+}
